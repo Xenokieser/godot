@@ -1,0 +1,54 @@
+## CEF Module
+
+## Installation
+### Windows
+
+Download and intall cef binaries following the intruction on thirdparty/cef
+
+Requirement : visual studio 2019
+
+For window you need to generate sln file using the following command:
+
+[source,bash]
+----
+scons -j6  p=windows vsproj=yes
+----
+
+Open and build using vs 2019
+
+## Description
+
+The cef include, lib and dll are present on thirdparty directory.
+
+They are referenced on the cef module SCsub file then scon use it to generate a proper sln file for visual studio  
+
+
+## Module architecture :
+
+The module is based on th erecommandation described on official  https://bitbucket.org/chromiumembedded/cef/wiki/GeneralUsage#markdown-header-important-concepts[General usage]  section
+
+### For windows:
+
+the module run on windowless mode , so it does not currently support accelerated compositing so performance may suffer as compared to a windowed browser.
+ 
+This require the implementation of CefRenderHandler interface
+
+
+#### Application Structure :
+
+#### Entry-Point Function :
+
+#### Message Loop :
+
+Set CefSettings.multi_threaded_message_loop = true (Windows only)
+
+#### CefSettings :
+
+
+
+
+
+
+
+
+

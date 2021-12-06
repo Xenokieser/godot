@@ -1,0 +1,72 @@
+Import('env')
+Import("env_modules")
+
+#######
+# VARS
+
+thirdparty_dir="#thirdparty/cef/"
+module_dir="#modules/cef/"
+libcef_dir="#thirdparty/cef/libcef_dll/"
+
+cef_wrapper_src = Glob(libcef_dir+"*.cc")
+cef_wrapper_src += Glob(libcef_dir+"base/*.cc")
+cef_wrapper_src += Glob(libcef_dir+"wrapper/*.cc")
+cef_wrapper_src += Glob(libcef_dir+"cpptoc/*.cc")
+#cef_src += Glob(libcef_dir+"cpptoc/test/*.cc")
+cef_wrapper_src += Glob(libcef_dir+"cpptoc/views/*.cc")
+cef_wrapper_src += Glob(libcef_dir+"ctocpp/*.cc")
+#cef_src += Glob(libcef_dir+"ctocpp/test/*.cc")
+cef_wrapper_src += Glob(libcef_dir+"ctocpp/views/*.cc")
+cef_wrapper_src += Glob(libcef_dir+"wrapper/*.cc")
+
+########
+# Init cef module
+env_cef = env_modules.Clone()
+env_cef.Prepend(CPPPATH=[module_dir, thirdparty_dir])
+#################################
+
+
+########
+# ENV thirdparty
+env_thirdparty = env_cef.Clone()
+env_thirdparty.disable_warnings()
+thirdparty_obj = []
+env_thirdparty.Append(CPPDEFINES=["WRAPPING_CEF_SHARED"])
+env_thirdparty.add_source_files(thirdparty_obj, cef_wrapper_src)
+env.modules_sources += thirdparty_obj
+#################################
+
+
+########
+# ENV cef
+module_obj = []
+
+env_cef.Append(CPPDEFINES=["UNICODE"])
+env_cef.add_source_files(module_obj, "webview/shared/browser/*.cc")
+env_cef.add_source_files(module_obj, "webview/shared/common/*.cc")
+env_cef.add_source_files(module_obj, "webview/test/*.cc")
+env_cef.add_source_files(module_obj, "webview/*.cc")
+env_cef.add_source_files(module_obj, "*.cpp")
+env_cef.add_source_files(module_obj, "webview/shared/renderer/*.cc")
+
+for file in module_obj:
+    print("Using variable customization file %s", file)
+
+env.modules_sources += module_obj
+#################################
+
+
+########
+# ENV    
+#env.Prepend(LIBS=[third_lib])
+#env["LIBSUFFIXES"] = ""
+if env.msvc:
+    env.Append(LIBS=[File('#thirdparty/cef/Debug/libcef.lib')])
+    env.Append(LINKFLAGS="d3d11.lib")
+else:
+    env.Append(LIBPATH=['#thirdparty/cef/Debug/'])
+    env.Append(LIBS = 'libcef')
+   
+env.Prepend(CPPPATH=[thirdparty_dir])
+#################################
+env.Depends(module_obj, thirdparty_obj)
